@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>لعبة XO</title>
+<style>
+    body {
+        margin: 0;
+        font-family: "Cairo", sans-serif;
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        justify-content: center;
+        align-items: center;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+        font-size: 2.5em;
+    }
+
+    .status {
+        margin-bottom: 20px;
+        font-size: 1.2em;
+    }
+
+    .board {
+        display: grid;
+        grid-template-columns: repeat(3, 120px);
+        grid-template-rows: repeat(3, 120px);
+        gap: 10px;
+    }
+
+    .cell {
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3em;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .cell:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(1.05);
+    }
+
+    .cell.taken {
+        cursor: not-allowed;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 10px 25px;
+        font-size: 1em;
+        border: none;
+        border-radius: 20px;
+        cursor: pointer;
+        background: #ff9800;
+        color: white;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        background: #ffc107;
+        transform: scale(1.05);
+    }
+
+    footer {
+        margin-top: auto;
+        width: 100%;
+        text-align: center;
+        padding: 15px;
+        background: rgba(0,0,0,0.3);
+        font-size: 0.9em;
+    }
+</style>
+</head>
+<body>
+
+<h1>🎮 لعبة XO</h1>
+<div class="status" id="status">الدور على اللاعب: X</div>
+
+<div class="board" id="board">
+    <div class="cell" data-index="0"></div>
+    <div class="cell" data-index="1"></div>
+    <div class="cell" data-index="2"></div>
+    <div class="cell" data-index="3"></div>
+    <div class="cell" data-index="4"></div>
+    <div class="cell" data-index="5"></div>
+    <div class="cell" data-index="6"></div>
+    <div class="cell" data-index="7"></div>
+    <div class="cell" data-index="8"></div>
+</div>
+
+<button onclick="resetGame()">إعادة اللعب</button>
+
+<footer>
+Student Name: Abdulrahman Abdulaziz ghazzawi | ID: 446003025 | Supervised by: Mohammed Jabali
+</footer>
+
+<script>
+    const cells = document.querySelectorAll(".cell");
+    const statusText = document.getElementById("status");
+
+    let currentPlayer = "X";
+    let gameActive = true;
+    let board = ["", "", "", "", "", "", "", "", ""];
+
+    const winConditions = [
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
+    ];
+
+    function handleCellClick() {
+        const index = this.getAttribute("data-index");
+
+        if (board[index] !== "" || !gameActive) return;
+
+        board[index] = currentPlayer;
+        this.textContent = currentPlayer;
+        this.classList.add("taken");
+
+        checkResult();
+    }
+
+    function checkResult() {
+        let roundWon = false;
+
+        for (let condition of winConditions) {
+            const a = board[condition[0]];
+            const b = board[condition[1]];
+            const c = board[condition[2]];
+
+            if (a === "" || b === "" || c === "") continue;
+
+            if (a === b && b === c) {
+                roundWon = true;
+                break;
+            }
+        }
+
+        if (roundWon) {
+            statusText.textContent = "🎉 اللاعب " + currentPlayer + " فاز!";
+            gameActive = false;
+            return;
+        }
+
+        if (!board.includes("")) {
+            statusText.textContent = "🤝 تعادل!";
+            gameActive = false;
+            return;
+        }
+
+        currentPlayer = currentPlayer === "X" ? "O" : "X";
+        statusText.textContent = "الدور على اللاعب: " + currentPlayer;
+    }
+
+    function resetGame() {
+        currentPlayer = "X";
+        gameActive = true;
+        board = ["", "", "", "", "", "", "", "", ""];
+        statusText.textContent = "الدور على اللاعب: X";
+        cells.forEach(cell => {
+            cell.textContent = "";
+            cell.classList.remove("taken");
+        });
+    }
+
+    cells.forEach(cell => cell.addEventListener("click", handleCellClick));
+</script>
+
+</body>
+</html>
